@@ -20,7 +20,7 @@ export default function SignupPage() {
     <div className='flex justify-center items-center w-full min-h-screen'>
       <div>
         <h1 className='text-center mb-12 text-4xl'>Inscription</h1>
-        <form action={formAction} className='flex flex-col justify-center items-center w-2xl p-8 border rounded-md bg-stone-950 border-teal-500'>
+        <form action={formAction} className='flex flex-col justify-center items-center w-2xl p-8 border rounded-md bg-primary border-accent shadow-lg'>
           <div className="grid grid-cols-2 gap-x-8 w-full">
             <InputText name="firstname" label="Prénom" defaultValue={state.values?.firstname} error={state.error?.firstname?.[0]} />
             <InputText name="lastname" label="Nom" defaultValue={state.values?.lastname} error={state.error?.lastname?.[0]} />
@@ -34,12 +34,13 @@ export default function SignupPage() {
             <p className="text-red-500 text-sm mt-4">{state.error.general[0]}</p>
           )}
 
+          <div className="mt-6"></div>
           <Button text="Inscription" />
         </form>
         <div className='flex flex-col justify-center items-center mt-8'>
           <p>
             Vous avez déjà un compte ?
-            <Link className='text-teal-500' href="/login"> Connectez vous !</Link>
+            <Link className='text-orange-400 transition duration-250  hover:text-orange-500' href="/login"> Connectez vous !</Link>
           </p>
         </div>
       </div>

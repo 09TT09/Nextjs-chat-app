@@ -4,6 +4,11 @@ import { redirect } from 'next/navigation'
 //import { createClient } from '@/utils/supabase/server'
 import { useState, useEffect  } from 'react'
 import { createClient } from "@/utils/supabase/client"
+import Button from '@/components/button'
+import FriendsList from '@/components/friendsList'
+import AddFriend from '@/components/addFriend'
+import FriendsRequests from '@/components/friendsRequests'
+import FriendsRequestsNotifications from '@/components/friendsRequestsNotifications'
 
 export default function Home() {
   const supabase = createClient()
@@ -15,6 +20,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [requests, setRequests] = useState<any[]>([])
   const [user, setUser] = useState<any>(null)
+  const [friends, setFriends] = useState<any[]>([])
 
   // Get current user + load requests on mount
   useEffect(() => {
@@ -26,15 +32,25 @@ export default function Home() {
       setUser(user)
 
       // Load all friend requests for this user
-      const { data, error } = await supabase
+      const { data: requests, error: reqError } = await supabase
         .from("friend_requests")
-        .select("*")
+        .select(`
+          *,
+          sender:profiles!friend_requests_sender_id_fkey (*),
+          receiver:profiles!friend_requests_receiver_id_fkey (*)
+        `)
         .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order("created_at", { ascending: false })
 
-      if (!error && data) {
-        setRequests(data)
+      if (!reqError && requests) {
+        setRequests(requests)
       }
+
+      const accepted = requests?.filter(r => r.status === "accepted") || []
+      const friends = accepted.map(r => {
+        return r.sender_id === user.id ? r.receiver : r.sender
+      })
+      setFriends(friends)
 
       // Setup realtime subscription
       const channel = supabase
@@ -151,89 +167,32 @@ export default function Home() {
 
   return (
     <div className="flex items-center flex-col w-full min-h-screen">
-      <div className="flex items-center gap-2 w-full h-14 border-b border-b-teal-500 bg-stone-950">
-        <button
-          className="h-10 min-w-36 rounded-md bg-teal-500 text-black p-2 cursor-pointer transition duration-250 hover:bg-teal-300"
-        >
-          Créer une conversation
-        </button>
-        <button
-          className="h-10 min-w-36 rounded-md bg-teal-500 text-black p-2 cursor-pointer transition duration-250 hover:bg-teal-300"
-          onClick={displayAddFriendWindow}
-        >
-          Amis
-        </button>
+      <div className="flex justify-between items-center gap-2 w-full h-16 px-6 border-b bg-primary border-accent shadow-lg">
+        <div className="flex justify-between items-center gap-3">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full border border-accent bg-gray-400"></div>
+          {user
+            ? (<p>{ user.email }</p>)
+            : (<p>utilisateur non connecté</p>)
+          }
+        </div>
+        <div className="flex justify-center items-center gap-3">
+          <Button text="Créer une conversation" variant="secondary" />
+          <Button onClick={displayAddFriendWindow} text="Amis" variant="secondary" />
+        </div>
       </div>
 
       {friendWindow ? (
-        <div className="mt-6 w-full max-w-md flex flex-col items-center">
-          {/* --- Add friend by code --- */}
-          <h3 className="text-lg text-teal-400 mb-2">Ajouter un ami</h3>
-          <div className="flex items-center gap-2 mb-6">
-            <input
-              type="text"
-              value={friendCode}
-              onChange={(e) => setFriendCode(e.target.value)}
-              placeholder="Entrez un code ami"
-              className="p-2 rounded-md border border-teal-500 text-black w-56"
-            />
-            <button
-              disabled={loading}
-              onClick={sendFriendRequest}
-              className="bg-teal-500 text-black rounded-md px-4 py-2 hover:bg-teal-300 transition disabled:opacity-50"
-            >
-              {loading ? "Envoi..." : "Envoyer"}
-            </button>
+        <div className="flex-1 flex flex-row w-full p-6 gap-6">
+          <FriendsList friends={friends} />
+          <div className="flex flex-col w-1/2 gap-6">
+            <AddFriend friendCode={friendCode} loading={loading} setFriendCode={setFriendCode} sendFriendRequest={sendFriendRequest}/>
+            <FriendsRequests requests={requests} user={user} respondToFriendRequest={respondToFriendRequest} />
+            <FriendsRequestsNotifications notifications={notifications}/>
           </div>
-
-          {/* --- Received friend requests --- */}
-          <h3 className="text-lg text-teal-400 mb-2">Demandes d’amis reçues</h3>
-          {requests.filter((r) => r.receiver_id === user?.id && r.status === "pending").length > 0 ? (
-            requests
-              .filter((r) => r.receiver_id === user?.id && r.status === "pending")
-              .map((req) => (
-                <div
-                  key={req.id}
-                  className="flex justify-between bg-stone-900 p-2 rounded-md mb-2 w-full"
-                >
-                  <p>{req.sender_id}</p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => respondToFriendRequest(req.id, true)}
-                      className="bg-green-500 text-black rounded px-2 py-1"
-                    >
-                      Accepter
-                    </button>
-                    <button
-                      onClick={() => respondToFriendRequest(req.id, false)}
-                      className="bg-red-500 text-black rounded px-2 py-1"
-                    >
-                      Refuser
-                    </button>
-                  </div>
-                </div>
-              ))
-          ) : (
-            <p className="text-gray-500">Aucune demande reçue</p>
-          )}
         </div>
       ) : (
         <p>Connecté</p>
       )}
-
-      {/* Notifications */}
-      <div className="mt-4">
-        {notifications.length > 0 ? (
-          notifications.map((msg, i) => (
-            <p key={i} className="text-sm text-gray-200">
-              {msg}
-            </p>
-          ))
-        ) : (
-          <p className="text-gray-400 text-sm">Aucune notification</p>
-        )}
-      </div>
-
     </div>
   );
 }
