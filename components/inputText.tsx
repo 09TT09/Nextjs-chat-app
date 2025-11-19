@@ -15,7 +15,7 @@ export default function InputText({name, label, value, defaultValue, placeholder
     <div className='flex flex-col items-center w-full'>
       <label className='w-full text-start mb-2' htmlFor={name}>{label}</label>
       <input
-        className='border rounded-md border-accent w-full h-10 mb-4 px-2 bg-secondary'
+        className={`border rounded-md w-full h-10 mb-4 px-2 bg-secondary ${error ? "mb-1 border-red-700" : "mb-4 border-accent"}`}
         id={name}
         name={name}
         value={value}

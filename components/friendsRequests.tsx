@@ -13,7 +13,7 @@ export default function FriendsRequests({requests, user, respondToFriendRequest}
     <div className="flex-1 flex flex-col p-6 border rounded-md bg-primary border-accent shadow-lg">
       <div className="flex items-center gap-4 mb-2">
         <h3 className="text-lg text-white">Demandes d'amis reçues</h3>
-        <div className="flex justify-center items-center min-w-16 h-7 border rounded-full border-orange-500 bg-secondary">
+        <div className={`flex justify-center items-center min-w-16 h-7 border rounded-full bg-secondary ${requests.filter((r) => r.receiver_id === user?.id && r.status === "pending").length > 0 ? "border-orange-500" : "border-accent" }`} >
           <p>{requests.filter((r) => r.receiver_id === user?.id && r.status === "pending").length}</p>
         </div>
       </div>
