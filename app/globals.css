@@ -23,7 +23,13 @@
     --primary: #292A2D;
     --secondary: #202124;
     --accent: #131313;
+    --accent-2: #99A1AF;
   }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; border-radius: 5px; }
+  ::-webkit-scrollbar-track { background-color: var(--accent); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb { background: var(--accent-2); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #767c86; }
 }
 
 body {

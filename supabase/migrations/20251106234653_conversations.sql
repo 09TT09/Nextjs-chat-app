@@ -1,6 +1,7 @@
 create table if not exists conversations (
   id uuid primary key default gen_random_uuid(),
   name text,
+  user_to_user boolean,
   created_by uuid references profiles(id) on delete set null,
   created_at timestamp with time zone default timezone('utc'::text, now()),
   updated_at timestamp with time zone default timezone('utc'::text, now())
