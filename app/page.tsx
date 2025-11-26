@@ -52,10 +52,10 @@ export default function Home() {
   }
 
   return (
-    <div className="flex items-center flex-col w-full h-screen">
+    <div className="flex items-center flex-col w-full h-full lg:h-screen">
       <Header user={user} displayAddFriendWindow={displayAddFriendWindow} logout={logout} />
       {friendWindow ? (
-        <div className="flex-1 flex flex-col w-full max-h-[calc(100vh-4rem)] p-3 gap-3 lg:flex-row lg:p-6 lg:gap-6">
+        <div className="flex-1 flex flex-col w-full max-h-none p-3 gap-3 lg:max-h-[calc(100vh-4rem)] lg:flex-row lg:p-6 lg:gap-6">
           <FriendsList friends={friends} currentUserId={user?.id} />
           <div className="flex-1 flex flex-col w-full max-h-full min-h-0 gap-3 lg:w-1/2 lg:gap-6">
             <AddFriend friendCode={friendCode} loading={loadingRequest} setFriendCode={setFriendCode} sendFriendRequest={sendFriendRequest} sentRequestStatus={sentRequestStatus} />
@@ -64,7 +64,7 @@ export default function Home() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex w-full">
+        <div className="flex w-full h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]">
           <div className="w-8/20 p-3 border-r border-accent bg-primary">
             <h3 className="text-lg text-white mb-3">Conversations</h3>
             <div className="mt-3">

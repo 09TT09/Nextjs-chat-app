@@ -17,11 +17,11 @@ export default function SignupPage() {
   })
 
   return (
-    <div className='flex justify-center items-center w-full min-h-screen'>
-      <div>
-        <h1 className='text-center mb-12 text-4xl'>Inscription</h1>
-        <form className='flex flex-col justify-center items-center w-2xl p-8 border rounded-md bg-primary border-accent shadow-lg'>
-          <div className="grid grid-cols-2 gap-x-8 w-full">
+    <div className="flex justify-center items-center w-full min-h-screen">
+      <div className="flex flex-col justify-center items-center flex-1">
+        <h1 className="text-center mb-12 text-4xl">Inscription</h1>
+        <form className="flex flex-col justify-center items-center min-w-18/20 py-4 px-2 mx-3 border rounded-md bg-primary border-accent shadow-lg xs:min-w-96 md:min-w-2xl xs:p-8">
+          <div className="flex flex-col grid-cols-2 gap-x-8 w-full md:grid">
             <InputText name="firstname" label="Prénom" defaultValue={state.values?.firstname} error={state.error?.firstname?.[0]} />
             <InputText name="lastname" label="Nom" defaultValue={state.values?.lastname} error={state.error?.lastname?.[0]} />
             <InputText name="pseudo" label="Pseudo" defaultValue={state.values?.pseudo} error={state.error?.pseudo?.[0]} />
@@ -37,10 +37,10 @@ export default function SignupPage() {
           <div className="mt-6"></div>
           <Button text="Inscription" formAction={formAction} />
         </form>
-        <div className='flex flex-col justify-center items-center mt-8'>
-          <p>
+        <div className="flex flex-col justify-center items-center mt-8">
+          <p className="text-center w-68 xs:w-auto">
             Vous avez déjà un compte ?
-            <Link className='text-orange-400 transition duration-250  hover:text-orange-500' href="/login"> Connectez vous !</Link>
+            <Link className="text-orange-400 transition duration-250  hover:text-orange-500" href="/login"> Connectez vous !</Link>
           </p>
         </div>
       </div>
