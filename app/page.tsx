@@ -37,7 +37,7 @@ export default function Home() {
     if (!loadingUser && !user) {
       router.replace("/login");
     }
-  }, [loadingUser, user]);
+  }, [router, loadingUser, user]);
 
   if (!user) return null;
 
@@ -48,7 +48,7 @@ export default function Home() {
 
   // Open the correct conversation
   function onMessage(otherUserId: string) {
-    createOrOpenConversation(user.id, otherUserId);
+    createOrOpenConversation(user!.id, otherUserId);
   }
 
   return (

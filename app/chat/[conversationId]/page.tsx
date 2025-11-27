@@ -5,19 +5,19 @@ import { useParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import Button from "@/components/button";
 
+import type { User } from "@supabase/supabase-js";
+import type { Message } from "@/types/message";
+
 export default function ChatPage() {
   const supabase = createClient();
   const params = useParams();
   const conversationId = params?.conversationId as string;
 
-  const [user, setUser] = useState<any>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  // Scroll to bottom
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
   // Fetch current user
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function ChatPage() {
       setUser(data.user);
     }
     fetchUser();
-  }, []);
+  }, [supabase.auth]);
 
   // Fetch messages
   useEffect(() => {
@@ -57,7 +57,8 @@ export default function ChatPage() {
           filter: `conversation_id=eq.${conversationId}`,
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new]);
+          const newMessage = payload.new as Message;
+          setMessages((prev) => [...prev, newMessage]);
         }
       )
       .subscribe();
@@ -66,7 +67,7 @@ export default function ChatPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId]);
+  }, [conversationId, supabase]);
 
   // Send message
   async function sendMessage() {

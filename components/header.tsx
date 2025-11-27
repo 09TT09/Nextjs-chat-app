@@ -5,9 +5,10 @@ import LogoutIcon from "@/public/logout.svg"
 import friendsIcon from "@/public/friends.svg"
 import ConversationIcon from "@/public/conversation.svg"
 import { useWindowWidth } from "@/hooks/useWindowWidth";
+import type { User } from "@supabase/supabase-js";
 
 interface HeaderProps {
-  user: any;
+  user: User;
   displayAddFriendWindow: () => void;
   logout: () => Promise<void>;
 }

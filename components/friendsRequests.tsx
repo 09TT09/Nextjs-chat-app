@@ -3,9 +3,12 @@
 import Button from "./button";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 
+import type { User } from "@supabase/supabase-js";
+import type { FriendRequest } from "@/types/friendRequest";
+
 interface FriendsRequestsProps {
-  requests: any[];
-  user: any;
+  requests: FriendRequest[];
+  user: User;
   respondToFriendRequest: (requestId: number, accepted: boolean) => void | Promise<void>;
 }
 
@@ -15,7 +18,7 @@ export default function FriendsRequests({requests, user, respondToFriendRequest}
   return(
     <div className="flex flex-col w-full h-124 p-3 border rounded-md bg-primary border-accent shadow-lg lg:h-auto lg:flex-1 lg:p-6 lg:min-h-0">
       <div className="flex items-center gap-4 mb-3">
-        <h3 className="text-md text-white md:text-lg">Demandes d'amis reçues</h3>
+        <h3 className="text-md text-white md:text-lg">Demandes d&apos;amis reçues</h3>
         <div className={`flex justify-center items-center min-w-16 h-7 border rounded-full bg-secondary ${requests.filter((r) => r.receiver_id === user?.id && r.status === "pending").length > 0 ? "border-orange-500" : "border-accent" }`} >
           <p>{requests.filter((r) => r.receiver_id === user?.id && r.status === "pending").length}</p>
         </div>

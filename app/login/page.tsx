@@ -1,10 +1,10 @@
 "use client"
 
-import { login } from './actions'
-import InputEmail from '@/components/inputEmail'
-import InputPassword from '@/components/inputPassword'
-import Button from '@/components/button'
-import Link from 'next/link'
+import { login } from "./actions"
+import InputEmail from "@/components/inputEmail"
+import InputPassword from "@/components/inputPassword"
+import Button from "@/components/button"
+import Link from "next/link"
 import { useActionState } from "react"
 
 const initialState = {
@@ -32,7 +32,7 @@ export default function LoginPage() {
         </form>
         <div className="flex flex-col justify-center items-center mt-8">
           <p className="text-center w-68 xs:w-auto">
-            Vous n'avez pas encore de compte ?
+            Vous n&apos;avez pas encore de compte ?
             <Link className="text-orange-400 transition duration-250 hover:text-orange-500" href="/signup"> Créer en un !</Link>
           </p>
         </div>

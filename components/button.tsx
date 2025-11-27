@@ -8,7 +8,7 @@ interface ButtonProps {
   text?: string;
   variant?: "primary" | "secondary" | "accept" | "refuse" | "icon" | "icon2";
   loading?: boolean;
-  imgSrc?: any;
+  imgSrc?: string;
   imgAlt?: string;
   imgColorInverted?: boolean 
 }

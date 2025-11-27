@@ -12,8 +12,8 @@ export default function FriendsRequestsNotifications({notifications} : FriendsRe
       <div className="flex-1 flex flex-col pr-3 overflow-y-auto">
         {notifications.length > 0 ? (
           notifications.map((message, i) => (
-            <div className="flex p-2 mb-2 w-full border rounded-md border-accent bg-secondary">
-              <p key={i} className="text-sm text-gray-200">{message}</p>
+            <div key={i} className="flex p-2 mb-2 w-full border rounded-md border-accent bg-secondary">
+              <p className="text-sm text-gray-200">{message}</p>
             </div>
           ))
         ) : (

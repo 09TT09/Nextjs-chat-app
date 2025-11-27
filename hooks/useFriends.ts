@@ -4,17 +4,22 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 
+import type { User } from "@supabase/supabase-js";
+import type { Profile } from "@/types/profile";
+import type { FriendRequest } from "@/types/friendRequest";
+import type { Conversation } from "@/types/conversation";
+
 export function useFriends() {
   const supabase = createClient();
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [friendCode, setFriendCode] = useState("");
   const [loadingRequest, setLoadingRequest] = useState(false);
-  const [requests, setRequests] = useState<any[]>([]);
-  const [friends, setFriends] = useState<any[]>([]);
+  const [requests, setRequests] = useState<FriendRequest[]>([]);
+  const [friends, setFriends] = useState<Profile[]>([]);
   const [notifications, setNotifications] = useState<string[]>([]);
-  const [conversations, setConversations] = useState<any[]>([])
+  const [conversations, setConversations] = useState<Conversation[]>([])
   const [sentRequestStatus, setSentRequestStatus] = useState<{
     type: "error" | "success";
     message: string;
@@ -53,7 +58,7 @@ export function useFriends() {
     }
 
     fetchData();
-  }, []);
+  }, [supabase]);
 
   // Load user's conversations
   useEffect(() => {
@@ -63,7 +68,7 @@ export function useFriends() {
       const { data: participantRows, error } = await supabase
         .from("conversation_participants")
         .select("conversation_id")
-        .eq("user_id", user.id);
+        .eq("user_id", user!.id);
 
       if (error) {
         console.error("Error loading conversations:", error);
@@ -86,7 +91,7 @@ export function useFriends() {
           created_at,
           conversation_participants (
             user_id,
-            profiles (
+            profiles:profiles (
               id,
               pseudo,
               email,
@@ -103,15 +108,15 @@ export function useFriends() {
         return;
       }
 
-      const formatted = conversationsData.map((conv) => {
-        const participants = conv.conversation_participants.map((p) => p.profiles);
+      const formatted: Conversation[] = conversationsData.map((conv) => {
+        const participants: Profile[] = conv.conversation_participants.flatMap((p) => p.profiles);
 
-        const otherUser = participants.find((p) => p.id !== user.id);
+        const otherUser = participants.find((p) => p.id !== user!.id) ?? null;
 
         return {
           conversationId: conv.id,
           name: conv.name,
-          otherUser: otherUser ?? null,
+          otherUser,
           createdAt: conv.created_at,
           participants,
         };
@@ -121,7 +126,7 @@ export function useFriends() {
     }
 
     loadConversations();
-  }, [user?.id]);
+  }, [supabase, user]);
 
   // Realtime updates
   useEffect(() => {
@@ -132,7 +137,7 @@ export function useFriends() {
       .on("postgres_changes",
         { event: "*", schema: "public", table: "friend_requests" },
         async (payload) => {
-          const request = payload.new as any;
+          const request = payload.new as FriendRequest;
 
           if (request.sender_id !== user.id && request.receiver_id !== user.id) {
             return;
@@ -190,7 +195,7 @@ export function useFriends() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [supabase, user]);
 
   // Send friend request
   async function sendFriendRequest() {

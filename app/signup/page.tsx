@@ -8,8 +8,6 @@ import Button from '@/components/button'
 import Link from 'next/link'
 import { useActionState } from 'react'
 
-const initialState = { error: {} }
-
 export default function SignupPage() {
   const [state, formAction] = useActionState(signup, {
     error: {},
