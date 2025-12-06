@@ -1,54 +1,89 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import { useFriendRequests } from "@/hooks/useFriendRequest";
+import { useConversations } from "@/hooks/useConversation";
 import { useFriends } from "@/hooks/useFriends";
-import { useChat } from "@/hooks/useChat";
-import { useState, useEffect } from "react";
-
+import Header from "@/components/header";
+import FriendCode from "@/components/friendCode";
 import FriendsList from "@/components/friendsList";
 import AddFriend from "@/components/addFriend";
 import FriendsRequests from "@/components/friendsRequests";
 import FriendsRequestsNotifications from "@/components/friendsRequestsNotifications";
 import ConversationsList from "@/components/conversationsList";
-import Header from "@/components/header";
+import Conversation from "@/components/conversation";
+import Loading from "@/components/loading";
 
-export default function Home() {
+export default function Test() {
   const router = useRouter();
-  const { createOrOpenConversation } = useChat();
+  const { user, loadingAuthUser, logout } = useAuth();
+
+  /* Redirect the user if not authenticated */
+  useEffect(() => {
+    if (!user && !loadingAuthUser) router.replace("/login");
+  }, [loadingAuthUser, user, router]);
+
+  const { profile, profileLoading } = useProfile(user?.id ?? null);
   const {
-    user,
-    loadingUser,
+    sendFriendRequest, 
     friendCode,
     setFriendCode,
-    friends,
+    addFriendRequestloading,
+    sentRequestStatus,
+    respondToFriendRequest,
     requests,
     notifications,
-    loadingRequest,
-    sendFriendRequest,
-    respondToFriendRequest,
-    sentRequestStatus,
-    conversations,
-    logout,
-  } = useFriends();
+  } = useFriendRequests(user?.id ?? null)
+  const { conversations, createOrOpenConversation } = useConversations(user?.id ?? null);
+  const { friends } = useFriends(user?.id ?? null)
+
   const [friendWindow, setFriendWindow] = useState(false);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
 
-  // Redirect the user after hydration if not connected
-  useEffect(() => {
-    if (!loadingUser && !user) {
-      router.replace("/login");
-    }
-  }, [router, loadingUser, user]);
-
-  if (!user) return null;
-
-  // Change the displayed component
-  function displayAddFriendWindow() {
-    setFriendWindow((prev) => !prev);
+  /* Display a loading screen when the user and is profile are not loaded */
+  if (!user || loadingAuthUser || profileLoading) {
+    return <Loading />
   }
 
-  // Open the correct conversation
-  function onMessage(otherUserId: string) {
-    createOrOpenConversation(user!.id, otherUserId);
+  /* Open a conversation in the right panel */
+  async function openConversation(friendId: string) {
+    try {
+      const id = await createOrOpenConversation(user!.id, friendId);
+      setSelectedConversationId(id);
+      setFriendWindow(false);
+    }
+    catch (error) {
+      console.error("Failed to open conversation:", error);
+    }
+  }
+
+  /* Open a conversation in the right panel */
+  function handleOpenConversation(conversationId: string) {
+    setSelectedConversationId(conversationId);
+  }
+
+  /* Switch the components shown on screen */
+  function displayAddFriendWindow() {
+    setFriendWindow((state) => !state);
+  }
+
+  /* Display the correct conversation component */
+  function setActiveConversation() {
+    if (selectedConversationId) {
+      return (
+        <Conversation user={user!} conversationId={selectedConversationId} />
+      )
+    }
+    else {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <p className="text-md text-white">Sélectionnez une conversation</p>
+        </div>
+      )
+    }
   }
 
   return (
@@ -56,9 +91,12 @@ export default function Home() {
       <Header user={user} displayAddFriendWindow={displayAddFriendWindow} logout={logout} />
       {friendWindow ? (
         <div className="flex-1 flex flex-col w-full max-h-none p-3 gap-3 lg:max-h-[calc(100vh-4rem)] lg:flex-row lg:p-6 lg:gap-6">
-          <FriendsList friends={friends} currentUserId={user?.id} />
           <div className="flex-1 flex flex-col w-full max-h-full min-h-0 gap-3 lg:w-1/2 lg:gap-6">
-            <AddFriend friendCode={friendCode} loading={loadingRequest} setFriendCode={setFriendCode} sendFriendRequest={sendFriendRequest} sentRequestStatus={sentRequestStatus} />
+            <FriendCode myFriendCode={profile!.friendcode} />
+            <FriendsList friends={friends} onOpenConversation={async (friendId: string) => openConversation(friendId)} />
+          </div>
+          <div className="flex-1 flex flex-col w-full max-h-full min-h-0 gap-3 lg:w-1/2 lg:gap-6">
+            <AddFriend friendCode={friendCode} loading={addFriendRequestloading} setFriendCode={setFriendCode} sendFriendRequest={sendFriendRequest} sentRequestStatus={sentRequestStatus} />
             <FriendsRequests requests={requests} user={user} respondToFriendRequest={respondToFriendRequest} />
             <FriendsRequestsNotifications notifications={notifications} />
           </div>
@@ -68,10 +106,12 @@ export default function Home() {
           <div className="w-8/20 p-3 border-r border-accent bg-primary">
             <h3 className="text-lg text-white mb-3">Conversations</h3>
             <div className="mt-3">
-              <ConversationsList conversations={conversations} onMessage={onMessage} />
+              <ConversationsList conversations={conversations} onMessage={handleOpenConversation} />
             </div>
           </div>
-          <div className="flex-1"></div>
+          <div className="flex-1">
+            {setActiveConversation()}
+          </div>
         </div>
       )}
     </div>

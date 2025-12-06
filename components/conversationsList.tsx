@@ -8,13 +8,12 @@ interface ConversationsListProps {
 }
 
 export default function ConversationsList({conversations, onMessage} : ConversationsListProps)  {
-  console.log(conversations)
 
   return(
     <>
       {conversations?.length > 0 ? (
         conversations.map((conversation) => (
-          <div key={conversation.conversationId} onClick={() => conversation.otherUser && onMessage(conversation.otherUser.id)} className="flex items-center gap-3 p-3 border rounded-md border-accent shadow-md bg-secondary cursor-pointer">
+          <div key={conversation.conversationId} onClick={() => onMessage(conversation.conversationId)} className="flex items-center gap-3 p-3 border rounded-md border-accent shadow-md bg-secondary cursor-pointer">
             <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full border border-accent bg-gray-400"></div>
             <div className="flex flex-col">
               <p className="text-white text-sm">{conversation.otherUser?.pseudo ?? "Unknown user"}</p>

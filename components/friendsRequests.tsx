@@ -7,12 +7,12 @@ import type { User } from "@supabase/supabase-js";
 import type { FriendRequest } from "@/types/friendRequest";
 
 interface FriendsRequestsProps {
+  user: User | null;
   requests: FriendRequest[];
-  user: User;
   respondToFriendRequest: (requestId: number, accepted: boolean) => void | Promise<void>;
 }
 
-export default function FriendsRequests({requests, user, respondToFriendRequest} : FriendsRequestsProps)  {
+export default function FriendsRequests({user, requests, respondToFriendRequest} : FriendsRequestsProps)  {
   const width = useWindowWidth();
 
   return(

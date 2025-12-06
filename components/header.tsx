@@ -8,9 +8,9 @@ import { useWindowWidth } from "@/hooks/useWindowWidth";
 import type { User } from "@supabase/supabase-js";
 
 interface HeaderProps {
-  user: User;
+  user: User | null;
   displayAddFriendWindow: () => void;
-  logout: () => Promise<void>;
+  logout: () => void;
 }
 
 export default function Header({user, displayAddFriendWindow, logout}: HeaderProps)  {

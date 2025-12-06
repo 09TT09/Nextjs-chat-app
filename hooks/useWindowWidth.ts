@@ -1,8 +1,6 @@
-"use client";
-
 import { useEffect, useState } from "react";
 
-// Return the width of the window (responsive)
+/* Return the width of the window (responsive) */
 export function useWindowWidth() {
   const [width, setWidth] = useState<number>(0);
 

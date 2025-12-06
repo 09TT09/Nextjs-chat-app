@@ -10,7 +10,7 @@ interface ButtonProps {
   loading?: boolean;
   imgSrc?: string;
   imgAlt?: string;
-  imgColorInverted?: boolean 
+  imgColorInverted?: boolean;
 }
 
 export default function Button({formAction, onClick, text, variant = "primary", loading = false, imgSrc, imgAlt = "", imgColorInverted = false}: ButtonProps)  {
@@ -32,7 +32,7 @@ export default function Button({formAction, onClick, text, variant = "primary", 
       disabled={loading}
     >
       {imgSrc
-        ? ( <Image src={imgSrc} width={25} height={25} alt={imgAlt} className={`${imgColorInverted && "invert"}`} /> )
+        ? ( <Image src={imgSrc} width={25} height={25} alt={imgAlt} loading="eager" className={`${imgColorInverted && "invert"}`} /> )
         : ( text )}
     </button>
   )

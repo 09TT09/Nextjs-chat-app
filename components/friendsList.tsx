@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "./button";
-import { useChat } from "@/hooks/useChat";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import MessageIcon from "@/public/message.svg"
 import ParametersIcon from "@/public/parameters.svg"
@@ -10,15 +9,14 @@ import type { Profile } from "@/types/profile";
 
 interface FriendsListProps {
   friends: Profile[];
-  currentUserId: string;
+  onOpenConversation: (friendId: string) => void;
 }
 
-export default function FriendsList({friends, currentUserId} : FriendsListProps) {
-  const { createOrOpenConversation } = useChat();
+export default function FriendsList({friends, onOpenConversation} : FriendsListProps) {
   const width = useWindowWidth();
 
   return(
-    <div className="flex flex-col w-full h-124 p-3 border rounded-md bg-primary border-accent shadow-lg lg:h-auto lg:flex-1 lg:w-1/2 lg:p-6 lg:min-h-0">
+    <div className="flex flex-col w-full h-124 p-3 border rounded-md bg-primary border-accent shadow-lg lg:h-auto lg:flex-1 lg:p-6 lg:min-h-0">
       <h3 className="text-lg text-white mb-3">Liste d&apos;amis</h3>
       {friends.length > 0 ? (
       <div className="flex-1 flex flex-col gap-2 pr-3 overflow-y-auto">
@@ -33,7 +31,7 @@ export default function FriendsList({friends, currentUserId} : FriendsListProps)
               {width < 512 && (
                 <div className="flex flex-row gap-2 mt-2">
                   <Button imgSrc={ParametersIcon} imgAlt="Options" variant="icon" />
-                  <Button onClick={() => createOrOpenConversation(currentUserId, friend.id)} imgSrc={MessageIcon} imgAlt="Envoyer un message" variant="icon" />
+                  <Button onClick={() => onOpenConversation(friend.id)} imgSrc={MessageIcon} imgAlt="Envoyer un message" variant="icon" />
                 </div>
               )}
             </div>
@@ -41,7 +39,7 @@ export default function FriendsList({friends, currentUserId} : FriendsListProps)
           {width >= 512 && (
             <div className="flex flex-row gap-2">
               <Button imgSrc={ParametersIcon} imgAlt="Options" variant="icon" />
-              <Button onClick={() => createOrOpenConversation(currentUserId, friend.id)} imgSrc={MessageIcon} imgAlt="Envoyer un message" variant="icon" />
+              <Button onClick={() => onOpenConversation(friend.id)} imgSrc={MessageIcon} imgAlt="Envoyer un message" variant="icon" />
             </div>
           )}
         </div>

@@ -11,7 +11,7 @@ interface FriendsListProps {
 }
 
 export default function AddFriend({friendCode, loading, setFriendCode, sendFriendRequest, sentRequestStatus} : FriendsListProps)  {
-  return(
+  return (
     <div className="flex flex-col gap-3 p-3 border rounded-md bg-primary border-accent shadow-lg lg:p-6">
       <h3 className="text-md text-white md:text-lg">Ajouter un ami</h3>
       <div>
