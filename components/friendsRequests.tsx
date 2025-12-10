@@ -1,8 +1,8 @@
 "use client";
 
+import Image from 'next/image'
 import Button from "./button";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
-
 import type { User } from "@supabase/supabase-js";
 import type { FriendRequest } from "@/types/friendRequest";
 
@@ -25,11 +25,17 @@ export default function FriendsRequests({user, requests, respondToFriendRequest}
       </div>
 
       <div className="flex-1 flex flex-col gap-2 pr-3 overflow-y-auto">
-        {requests.filter((r) => r.receiver_id === user?.id && r.status === "pending").length > 0 ? (
-          requests.filter((r) => r.receiver_id === user?.id && r.status === "pending").map((req) => (
+        {requests.filter((request) => request.receiver_id === user?.id && request.status === "pending").length > 0 ? (
+          requests.filter((request) => request.receiver_id === user?.id && request.status === "pending").map((req) => (
             <div key={req.id} className="flex flex-col justify-between items-start gap-3 p-2 mb-2 w-full border rounded-md border-accent bg-secondary xs:flex-row xs:items-center">
               <div className="flex items-center gap-3 mr-3">
-                <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full border border-accent bg-gray-400"></div>
+                {req.sender.picture
+                  ? (
+                    <div className="shrink-0 relative w-12 h-12">
+                      <Image src={req.sender.picture} fill unoptimized alt="image de profile" className="object-cover rounded-full border border-accent drag-none"/>
+                    </div>
+                  )
+                  : ( <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full border border-accent bg-gray-400"></div> )}
                 <div className="flex flex-col w-full max-w-50 xs:w-50">
                   <p className="text-white font-semibold">{req.sender.pseudo}</p>
                   <p className="text-gray-400 text-sm">{req.sender.email}</p>

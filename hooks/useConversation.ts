@@ -1,84 +1,113 @@
-"use client";
-
+import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { getUserConversationIds, getConversationsByIds, createOrFindConversation } from "@/services/conversations.service";
+import { getUserConversationIds, getConversationsByIds, /*createOrFindConversation,*/ createUserToUserConversation } from "@/services/conversations.service";
 import type { Conversation } from "@/types/conversation";
 
 export function useConversations(userId: string | null) {
+  const supabase = createClient();
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [conversationsloading, setConversationsLoading] = useState(true);
+  const mounted = useRef(true);
 
   /* Prevent state updates after unmount */
-  const mounted = useRef(true);
-  useEffect(() => {
-    return () => { mounted.current = false; };
-  }, []);
+  useEffect(() => { return () => { mounted.current = false; }; }, []);
 
-  /* Load the conversations for user authenticated */
-  const loadConversations = useCallback(async () => {
-    if (!userId) return;
+  /* Load the conversations for authenticated user */
+  const loadConversations = useCallback(async (signal?: AbortSignal) => {
+    if (!userId || signal?.aborted) return;
 
-    setLoading(true);
+    setConversationsLoading(true);
 
     try {
-      const { data: participantRows, error } = await getUserConversationIds(userId);
-      if (error) throw error;
-
-      if (!participantRows?.length) {
-        if (mounted.current) setConversations([]);
+      const participantConversations = await getUserConversationIds(userId);
+      if (signal?.aborted) return;
+      if (participantConversations.length === 0) {
+        setConversations([]);
         return;
       }
+      const conversationsIds = participantConversations.map(participant => participant.conversation_id);
+      const conversationsRows = await getConversationsByIds(userId);
+      if (signal?.aborted) return;
 
-      const ids = participantRows.map((p) => p.conversation_id);
+      const formatted: Conversation[] = conversationsRows.map(conversation => ({
+        conversationId: conversation.conversationId,
+        name: conversation.name,
+        createdAt: conversation.createdAt,
+        participants: conversation.participants,
+        otherUser: conversation.otherUser,
+      }));
 
-      const { data: convRows, error: convError } = await getConversationsByIds(ids);
-      if (convError) throw convError;
-
-      const formatted: Conversation[] = convRows.map((c) => {
-        const participants = c.conversation_participants.map((p) => p.profiles);
-        return {
-          conversationId: c.id,
-          name: c.name,
-          createdAt: c.created_at,
-          participants,
-          otherUser: participants.find((p) => p.id !== userId) ?? null
-        };
-      });
-
-      if (mounted.current) setConversations(formatted);
-    } finally {
-      if (mounted.current) setLoading(false);
+      setConversations(formatted);
+    }
+    finally {
+      if (!signal?.aborted) setConversationsLoading(false);
     }
   }, [userId]);
 
-  /* Auto-load when user changes */
+  /* Auto-load conversations when userId changes */
+  useEffect(() => { if (userId) loadConversations(); }, [userId, loadConversations]);
+
+  /* Create or open a user to user conversation */
+  const createOrOpenConversation = useCallback(
+    async (otherUserId: string): Promise<string> => {
+      if (!userId) throw new Error("User not authenticated");
+
+      try {
+        const conversationId = await createUserToUserConversation(otherUserId);
+        await loadConversations();
+        return conversationId;
+      } catch (error) {
+        console.error("Failed to create/open conversation:", error);
+        throw error;
+      }
+    },
+    [userId, loadConversations]
+  );
+
+  /* Refresh conversations if the user is added to a new conversation */
   useEffect(() => {
-    if (userId) loadConversations();
+    if (!userId) return;
+
+    const channel = supabase
+      .channel(`user:${userId}:conversations`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "conversation_participants",
+        },
+        async (payload) => {
+          if (payload.new.user_id === userId) {
+            await loadConversations();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [userId, loadConversations]);
 
-  /* CREATE or OPEN a 1–1 conversation */
-  const createOrOpenConversation = useCallback(
-    async (userA: string, userB: string): Promise<string> => {
-      const { data, error } = await createOrFindConversation(userA, userB);
-
-      if (error) throw error;
-      if (!data?.id) throw new Error("Conversation ID missing from response.");
-
-      await loadConversations();
-      return data.id;
-    },
-    [loadConversations]
-  );
 
   /* Helper for UI: open a conversation with one user */
   async function onMessage(otherUserId: string): Promise<string | null> {
     if (!userId) return null;
-    return await createOrOpenConversation(userId, otherUserId);
+
+    try {
+      const conversationId = await createUserToUserConversation(otherUserId);
+      await loadConversations(); // refresh the list
+      return conversationId;
+    } catch (error) {
+      console.error("Failed to create/open conversation:", error);
+      return null;
+    }
   }
 
   return {
     conversations,
-    loading,
+    conversationsloading,
     reload: loadConversations,
     createOrOpenConversation,
     onMessage

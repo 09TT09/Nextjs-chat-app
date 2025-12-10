@@ -1,3 +1,4 @@
+-- Create the friend_requests table
 create table if not exists friend_requests (
   id bigint generated always as identity primary key,
   sender_id uuid not null references profiles(id) on delete cascade,
@@ -8,26 +9,26 @@ create table if not exists friend_requests (
   unique (sender_id, receiver_id)
 );
 
+-- Indexes for faster queries
 create index if not exists idx_friend_requests_sender_id on friend_requests(sender_id);
 create index if not exists idx_friend_requests_receiver_id on friend_requests(receiver_id);
 
-alter table friend_requests enable row level security;
+-- Enable Row Level Security (RLS)
+/*alter table friend_requests enable row level security;*/
 
--- Users can view their own incoming or outgoing requests
+-- Create policies
 create policy "Users can view own friend requests"
   on friend_requests for select
   using (sender_id = auth.uid() or receiver_id = auth.uid());
 
--- Users can send requests (insert)
 create policy "Users can send friend requests"
   on friend_requests for insert
   with check (sender_id = auth.uid());
 
--- Users can accept or reject requests they received
 create policy "Receivers can update request status"
   on friend_requests for update
   using (receiver_id = auth.uid())
   with check (receiver_id = auth.uid());
 
--- Enable Realtime on the table
+-- Enable Realtime
 alter publication supabase_realtime add table public.friend_requests;

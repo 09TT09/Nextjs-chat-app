@@ -114,7 +114,7 @@ export function useFriendRequests(userId: string | null) {
                 setNotifications(prev => [ ...prev, `${receiver?.pseudo ?? "Utilisateur"} a accepté votre demande !` ]);
               } else if (request.receiver_id === userId) {
                 addFriend(sender);
-                setNotifications(prev => [ ...prev, `👥 Vous êtes maintenant ami avec ${sender?.pseudo ?? "Utilisateur"} !` ]);
+                setNotifications(prev => [ ...prev, `Vous êtes maintenant ami avec ${sender?.pseudo ?? "Utilisateur"} !` ]);
               }
             }
             if (request.status === "rejected") {

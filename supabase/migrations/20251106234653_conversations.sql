@@ -1,3 +1,4 @@
+-- Create the conversations table
 create table if not exists conversations (
   id uuid primary key default gen_random_uuid(),
   name text,
@@ -7,4 +8,8 @@ create table if not exists conversations (
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
+-- Index for faster queries
 create index if not exists idx_conversations_created_at on conversations(created_at);
+
+-- Enable Realtime
+alter publication supabase_realtime add table public.conversations;

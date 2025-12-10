@@ -1,5 +1,6 @@
 create extension if not exists pgcrypto;
 
+-- Create the profiles table
 create table if not exists profiles (
   id uuid references auth.users on delete cascade not null primary key,
   pseudo text unique,
@@ -12,8 +13,10 @@ create table if not exists profiles (
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
-alter table profiles enable row level security;
+-- Enable Row Level Security (RLS)
+/*alter table profiles enable row level security;*/
 
+-- Create policies
 create policy "ALL Users can view each other profile"
   on profiles for select
   using (true);

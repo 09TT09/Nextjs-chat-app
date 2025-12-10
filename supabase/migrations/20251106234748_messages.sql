@@ -1,4 +1,4 @@
--- 1️⃣ Create the messages table
+-- Create the messages table
 create table if not exists messages (
   id uuid primary key default gen_random_uuid(),
   conversation_id uuid not null references conversations(id) on delete cascade,
@@ -8,14 +8,15 @@ create table if not exists messages (
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
+-- Indexes for faster queries
 create index if not exists idx_messages_conversation_id on messages(conversation_id);
 create index if not exists idx_messages_user_id on messages(user_id);
 create index if not exists idx_messages_created_at on messages(created_at);
 
--- 2️⃣ Enable Row Level Security (RLS)
-alter table messages enable row level security;
+-- Enable Row Level Security (RLS)
+/*alter table messages enable row level security;*/
 
--- 3️⃣ Create policies
+-- Create policies
 create policy "Users can view their messages"
   on messages for select
   using (
@@ -38,5 +39,5 @@ create policy "Users can send messages"
     )
   );
 
--- 4️⃣ Enable Realtime
+-- Enable Realtime
 alter publication supabase_realtime add table public.messages;

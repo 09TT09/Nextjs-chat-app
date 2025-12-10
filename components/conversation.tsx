@@ -2,11 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import Button from "@/components/button";
 import type { User } from "@supabase/supabase-js";
 import type { Message } from "@/types/message";
-import Button from "@/components/button";
 
-export default function Conversation({ user, conversationId }: { conversationId: string, user: User }) {
+interface ConversationProps {
+  conversationId: string;
+  user: User;
+}
+
+export default function Conversation({ user, conversationId }: ConversationProps) {
   const supabase = createClient();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
