@@ -6,20 +6,16 @@ export function useProfile(userId: string | null) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
-  /* Get the profile of the authenticated user */
+  async function fetchProfile() {
+    if (!userId) return;
+    const data = await getProfile(userId);
+    setProfile(data);
+    setProfileLoading(false);
+  }
+
   useEffect(() => {
-    if (!userId) {
-      return;
-    }
-
-    async function fetchProfile() {
-      const data = await getProfile(userId!);
-      setProfile(data);
-      setProfileLoading(false);
-    }
-
     fetchProfile();
   }, [userId]);
 
-  return { profile, profileLoading };
+  return { profile, profileLoading, refreshProfile: fetchProfile };
 }

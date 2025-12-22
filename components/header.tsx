@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Image from 'next/image'
 import Button from "@/components/button";
 import LogoutIcon from "@/public/logout.svg"
@@ -16,18 +17,23 @@ interface HeaderProps {
 }
 
 export default function Header({user, picture, displayAddFriendWindow, logout}: HeaderProps)  {
+  const router = useRouter();
   const width = useWindowWidth();
+
+  function redirectToProfile() {
+    router.push("/profile");
+  }
 
   return(
     <div className="shrink-0 flex justify-between items-center gap-2 w-full h-16 px-6 border-b bg-primary border-accent shadow-lg">
       <div className="flex justify-between items-center gap-3">
         {picture
           ? (
-            <div className="shrink-0 relative w-12 h-12">
-              <Image src={picture} fill unoptimized alt="image de profile" className="object-cover rounded-full border border-accent drag-none"/>
+            <div onClick={() => redirectToProfile()} className="shrink-0 relative w-12 h-12 cursor-pointer">
+              <Image src={picture} fill unoptimized alt="image de profil" className="object-cover rounded-full border border-accent drag-none"/>
             </div>
           )
-          : ( <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full border border-accent bg-gray-400"></div> )}
+          : ( <div onClick={() => redirectToProfile()} className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full border border-accent bg-gray-400 cursor-pointer"></div> )}
         {width > 640 && (
           <div className="w-80">
             {user ? <p>{user.email}</p> : <p>Utilisateur non connecté</p>}

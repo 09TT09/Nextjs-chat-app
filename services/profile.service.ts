@@ -17,3 +17,23 @@ export async function getProfile(userId: string): Promise<Profile> {
 
   return data;
 }
+
+/* Update the profile with the user id and the fields to update */
+export async function updateProfile(
+  userId: string,
+  updates: Partial<Pick<Profile, "pseudo" | "firstname" | "lastname">>
+) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(updates)
+    .eq("id", userId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    throw new Error("Could not update profile");
+  }
+
+  return data;
+}

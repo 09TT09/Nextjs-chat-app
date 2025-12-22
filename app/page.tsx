@@ -7,6 +7,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useFriendRequests } from "@/hooks/useFriendRequest";
 import { useConversations } from "@/hooks/useConversation";
 import { useFriends } from "@/hooks/useFriends";
+import { useUIStore } from "@/stores/ui.store";
 import Header from "@/components/header";
 import FriendCode from "@/components/friendCode";
 import FriendsList from "@/components/friendsList";
@@ -20,6 +21,7 @@ import Loading from "@/components/loading";
 export default function Home() {
   const router = useRouter();
   const { user, loadingAuthUser, logout } = useAuth();
+  const { friendWindow, setFriendWindow } = useUIStore();
 
   /* Redirect the user if not authenticated */
   useEffect(() => {
@@ -40,7 +42,6 @@ export default function Home() {
   const { conversations, createOrOpenConversation } = useConversations(user?.id ?? null);
   const { friends } = useFriends(user?.id ?? null)
 
-  const [friendWindow, setFriendWindow] = useState(false);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
 
   /* Display a loading screen when the user and is profile are not loaded */
@@ -67,7 +68,7 @@ export default function Home() {
 
   /* Switch the components shown on screen */
   function displayAddFriendWindow() {
-    setFriendWindow((state) => !state);
+    setFriendWindow(!friendWindow);
   }
 
   /* Display the correct conversation component */
@@ -103,7 +104,7 @@ export default function Home() {
         </div>
       ) : (
         <div className="flex w-full h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]">
-          <div className="w-8/20 p-3 border-r border-accent bg-primary">
+          <div className="w-8/20 max-w-lg p-3 border-r border-accent bg-primary">
             <h3 className="text-lg text-white mb-3">Conversations</h3>
             <div className="mt-3">
               <ConversationsList conversations={conversations} onSelectConversation={handleOpenConversation} />

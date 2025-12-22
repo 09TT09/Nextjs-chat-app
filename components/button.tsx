@@ -6,7 +6,7 @@ interface ButtonProps {
   formAction?: (formData: FormData) => void | Promise<void>;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   text?: string;
-  variant?: "primary" | "secondary" | "accept" | "refuse" | "icon" | "icon2";
+  variant?: "primary" | "secondary" | "cancel"| "accept" | "refuse" | "icon" | "icon2";
   loading?: boolean;
   imgSrc?: string;
   imgAlt?: string;
@@ -17,6 +17,7 @@ export default function Button({formAction, onClick, text, variant = "primary", 
   const styles: Record<NonNullable<ButtonProps["variant"]>, string> = {
     primary: "shrink-0 h-12 min-w-36 rounded-md bg-orange-400 text-black p-2 cursor-pointer transition duration-250 hover:bg-orange-500 disabled:bg-gray-400",
     secondary: "shrink-0 h-10 min-w-28 text-sm rounded-md bg-orange-400 text-black p-2 cursor-pointer transition duration-250 hover:bg-orange-500 disabled:bg-gray-400",
+    cancel: "shrink-0 h-10 min-w-28 text-sm rounded-md bg-stone-600 text-white p-2 cursor-pointer transition duration-250 hover:bg-stone-700 disabled:bg-gray-400",
     accept: "shrink-0 h-8 min-w-20 text-sm rounded-md bg-green-600 text-black p-2 cursor-pointer transition duration-250 hover:bg-green-400 disabled:bg-gray-400 xs:min-w-28 sm:h-10 lg:h-8 xl:h-10",
     refuse: "shrink-0 h-8 min-w-20 text-sm rounded-md bg-red-500 text-black p-2 cursor-pointer transition duration-250 hover:bg-red-400 disabled:bg-gray-400 xs:min-w-28 sm:h-10 lg:h-8 xl:h-10",
     icon: "shrink-0 h-10 w-10 text-sm rounded-md bg-orange-400 text-black p-2 cursor-pointer transition duration-250 hover:bg-orange-500 disabled:bg-gray-400",
