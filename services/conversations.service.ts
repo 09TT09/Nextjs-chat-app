@@ -64,14 +64,57 @@ export async function getConversationsByIds(userId: string) {
 
 
 /* Create a user to user conversation */
-export async function createUserToUserConversation(otherUserId: string) {
-  const supabase = createClient();
+export async function openOrCreateUserConversation(userId: string, otherUserId: string): Promise<string> {
 
+  // Order user IDs
+  const user1 = userId < otherUserId ? userId : otherUserId
+  const user2 = userId < otherUserId ? otherUserId : userId
+
+  // Try to insert (safe because of unique index)
   const { data, error } = await supabase
-    .rpc("create_user_to_user_conversation", { other_user: otherUserId })
-    .single();
+    .from("conversations")
+    .insert({
+      user_to_user: true,
+      user1_id: user1,
+      user2_id: user2,
+      created_by: userId,
+    })
+    .select("id")
+    .single()
 
-  if (error) throw error;
+  // If insert succeeded, create the 2 participantsa and return new conversation
+  if (!error && data) {
+    await supabase
+      .from("conversation_participants")
+      .insert({
+        user_id: userId,
+        conversation_id: data.id,
+      })
 
-  return data.conversation_id as string;
+    await supabase
+      .from("conversation_participants")
+      .insert({
+        user_id: otherUserId,
+        conversation_id: data.id,
+      })
+    
+    return data.id
+  }
+
+  // If conflict, fetch existing conversation
+  const { data: existing, error: fetchError } = await supabase
+    .from("conversations")
+    .select("id")
+    .match({
+      user_to_user: true,
+      user1_id: user1,
+      user2_id: user2,
+    })
+    .single()
+
+  if (fetchError || !existing) {
+    throw fetchError ?? new Error("Failed to fetch conversation")
+  }
+
+  return existing.id
 }

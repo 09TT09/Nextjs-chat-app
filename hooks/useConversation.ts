@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { getUserConversationIds, getConversationsByIds, /*createOrFindConversation,*/ createUserToUserConversation } from "@/services/conversations.service";
+import { getUserConversationIds, getConversationsByIds, /*createOrFindConversation,*/ openOrCreateUserConversation } from "@/services/conversations.service";
 import type { Conversation } from "@/types/conversation";
 
 export function useConversations(userId: string | null) {
@@ -53,7 +53,7 @@ export function useConversations(userId: string | null) {
       if (!userId) throw new Error("User not authenticated");
 
       try {
-        const conversationId = await createUserToUserConversation(otherUserId);
+        const conversationId = await openOrCreateUserConversation(userId, otherUserId);
         await loadConversations();
         return conversationId;
       } catch (error) {
@@ -96,7 +96,7 @@ export function useConversations(userId: string | null) {
     if (!userId) return null;
 
     try {
-      const conversationId = await createUserToUserConversation(otherUserId);
+      const conversationId = await openOrCreateUserConversation(userId, otherUserId);
       await loadConversations(); // refresh the list
       return conversationId;
     } catch (error) {
