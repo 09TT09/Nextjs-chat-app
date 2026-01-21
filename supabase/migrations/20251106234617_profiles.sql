@@ -9,8 +9,8 @@ create table if not exists profiles (
   email text not null unique,
   picture text,
   friendcode text not null unique default encode(extensions.gen_random_bytes(5), 'hex'),
-  updated_at timestamp with time zone default timezone('utc'::text, now()),
-  created_at timestamp with time zone default timezone('utc'::text, now())
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
 -- Enable Row Level Security (RLS)

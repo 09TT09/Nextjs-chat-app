@@ -4,8 +4,8 @@ create table if not exists friend_requests (
   sender_id uuid not null references profiles(id) on delete cascade,
   receiver_id uuid not null references profiles(id) on delete cascade,
   status text check (status in ('pending', 'accepted', 'rejected')) default 'pending',
-  created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now()),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
   unique (sender_id, receiver_id)
 );
 

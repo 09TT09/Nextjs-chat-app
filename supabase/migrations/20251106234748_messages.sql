@@ -4,8 +4,8 @@ create table if not exists messages (
   conversation_id uuid not null references conversations(id) on delete cascade,
   user_id uuid not null references profiles(id) on delete cascade,
   message text not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now())
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
 -- Indexes for faster queries

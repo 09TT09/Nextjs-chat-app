@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useFriendStore } from "@/stores/friend.store";
-import { getProfile } from "@/services/profile.service";
+import { getProfile, getProfileWithFriendCode } from "@/services/profile.service";
 import { getFriendRequests } from "@/services/friends.service";
+import { createFriendRequest } from "@/services/friendRequests.service"
+import { getUnreadNotificationsForUser, createNotification } from "@/services/notifications.service";
 
 import type { FriendRequest } from "@/types/friendRequest";
 
@@ -19,40 +21,21 @@ export function useFriendRequests(userId: string | null) {
 
   /* Send friend request to an user with it friendcode */
   async function sendFriendRequest() {
-    if (!friendCode.trim()) {
-      setSentRequestStatus({ type: "error", message: "Veuillez entrer un code ami." });
-      return;
-    }
+    const showError = (message: string) => setSentRequestStatus({ type: "error", message });
 
+    if (!friendCode?.trim()) return showError("Veuillez entrer un code ami.");
+    if (!userId) return showError("Vous devez être connecté.");
     setAddFriendRequestloading(true);
 
     try {
-      if (!userId) {
-        setSentRequestStatus({ type: "error", message: "Vous devez être connecté." });
-        return;
-      }
+      const responseReceiverProfile = await getProfileWithFriendCode(userId, friendCode);
+      if (responseReceiverProfile.status === "error") return showError(responseReceiverProfile.message);
 
-      const { data: receiver, error } = await supabase.from("profiles").select("id").eq("friendcode", friendCode).single();
+      const responseFriendRequest = await createFriendRequest(userId, responseReceiverProfile.id);
+      if (responseFriendRequest.status === "error") return showError(responseFriendRequest.message);
 
-      if (error || !receiver) {
-        setSentRequestStatus({ type: "error", message: "Aucun utilisateur trouvé avec ce code." });
-        return;
-      }
-
-      if (receiver.id === userId) {
-        setSentRequestStatus({ type: "error", message: "Vous ne pouvez pas vous ajouter vous-même." });
-        return;
-      }
-
-      const { error: insertError } = await supabase
-        .from("friend_requests")
-        .insert({ sender_id: userId, receiver_id: receiver.id, });
-
-      if (insertError) {
-        setSentRequestStatus({ type: "error", message: insertError.message });
-      } else {
-        setSentRequestStatus({ type: "success", message: "Demande envoyée !" });
-      }
+      setSentRequestStatus({ type: "success", message: "Demande envoyée !" });
+      createNotification("FRIEND_REQUEST", responseReceiverProfile.id, userId, "friend_requests", responseFriendRequest.id)
     } finally {
       setAddFriendRequestloading(false);
     }
@@ -60,7 +43,10 @@ export function useFriendRequests(userId: string | null) {
 
   /* Accept or reject friend request */
   async function respondToFriendRequest(id: number, accepted: boolean) {
-    await supabase.from("friend_requests").update({ status: accepted ? "accepted" : "rejected" }).eq("id", id);
+    await supabase
+      .from("friend_requests")
+      .update({ status: accepted ? "accepted" : "rejected" })
+      .eq("id", id);
   }
 
   /* Load received friend requests */

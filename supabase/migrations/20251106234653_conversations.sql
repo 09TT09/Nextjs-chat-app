@@ -6,8 +6,8 @@ create table if not exists conversations (
   user1_id uuid,
   user2_id uuid,
   created_by uuid references profiles(id) on delete set null,
-  created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now())
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
 -- Enforce user1_id < user2_id (ordering)

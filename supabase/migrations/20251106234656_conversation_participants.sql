@@ -2,7 +2,7 @@
 create table if not exists conversation_participants (
   user_id uuid not null references profiles(id) on delete cascade,
   conversation_id uuid not null references conversations(id) on delete cascade,
-  created_at timestamp with time zone default timezone('utc'::text, now()),
+  created_at timestamptz default now(),
   primary key (user_id, conversation_id)
 );
 
