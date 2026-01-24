@@ -1,6 +1,6 @@
 -- Create the messages table
 create table if not exists messages (
-  id uuid primary key default gen_random_uuid(),
+  id bigint generated always as identity primary key,
   conversation_id uuid not null references conversations(id) on delete cascade,
   user_id uuid not null references profiles(id) on delete cascade,
   message text not null,

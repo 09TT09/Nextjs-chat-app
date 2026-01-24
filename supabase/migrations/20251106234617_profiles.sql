@@ -2,7 +2,7 @@ create extension if not exists pgcrypto;
 
 -- Create the profiles table
 create table if not exists profiles (
-  id uuid references auth.users on delete cascade not null primary key,
+  id uuid references auth.users on delete cascade primary key,
   pseudo text unique,
   firstname text,
   lastname text,

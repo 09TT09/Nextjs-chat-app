@@ -36,13 +36,15 @@ export async function createNotification(
       recipient_id: recipient_id,
       sender_id: sender_id,
       entity_type: entity_type,
-      entity_id: entity_id
+      entity_id: `${entity_id}`
     })
     .select("id")
     .single();
 
+  console.log(type, recipient_id, sender_id, entity_type, entity_id)
+
   if (error) {
-    throw new Error("Failed to create notification");
+    throw new Error("Failed to create notification : " + error.message);
   }
 
   if (!data || !data.id) {

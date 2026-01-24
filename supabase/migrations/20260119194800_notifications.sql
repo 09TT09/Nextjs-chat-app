@@ -1,11 +1,11 @@
 -- Create the notifications table
 create table if not exists notifications (
-  id uuid primary key default gen_random_uuid(),
+  id bigint generated always as identity primary key,
   recipient_id uuid not null references profiles(id) on delete cascade,
   sender_id uuid references profiles(id) on delete set null,
   type text not null,
   entity_type text not null,
-  entity_id uuid not null,
+  entity_id text not null,
   created_at timestamptz default now(),
   read_at timestamptz
 );
