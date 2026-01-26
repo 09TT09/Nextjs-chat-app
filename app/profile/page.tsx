@@ -11,7 +11,8 @@ import { updateProfile } from "@/services/profile.service";
 import ProfileBanner from "@/components/profileBanner";
 import ProfileAccountInformations from "@/components/profileAccountInformations";
 import ProfilePersonalInformations from "@/components/profilePersonalInformations";
-
+import ParametersSidebar from "@/components/parametersSidebar";
+import { useParametersSidebarStore } from "@/stores/parametersSidebar.store";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function ProfilePage() {
   const [editableValues, setEditableValues] = useState({ pseudo: "", firstname: "", lastname: "" });
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const { isOpen, setIsOpen } = useParametersSidebarStore();
 
   /* Initialize editable fields once profile is loaded */
   useEffect(() => {
@@ -96,19 +98,9 @@ export default function ProfilePage() {
       />
 
       <div className="flex w-full h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]">
-
-        <div className="w-8/20 max-w-sm p-3 border-r border-accent bg-primary">
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col px-3 p-2 bg-secondary rounded-md border border-accent shadow-sm">
-              <p>Mon profil</p>
-            </div>
-            <div className="flex flex-col px-3 p-2 bg-secondary rounded-md border border-accent shadow-sm">
-              <p>Paramètres</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 flex flex-col w-full h-full p-6 gap-4">
+        <ParametersSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+        <div className="flex-1 flex flex-col overflow-y-auto w-full max-h-screen p-6 gap-4">
+          <h1 className="text-3xl md:text-4xl">Profil</h1>
           <ProfileBanner profile={profile} />
           <ProfilePersonalInformations
             profile={profile}

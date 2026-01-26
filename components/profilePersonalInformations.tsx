@@ -26,9 +26,9 @@ interface ProfilePersonalInformationsProps {
 export default function ProfilePersonalInformations({profile, successMessage, errorMessage, editableValues, editMode, setEditMode, cancelEdit, saveEdit, setEditableValues}: ProfilePersonalInformationsProps) {
   return (
     <div className="flex flex-col gap-6 p-3 border rounded-md bg-primary border-accent shadow-lg lg:p-6">
-      <div className="flex justify-between">
+      <div className="flex flex-col justify-between sm:flex-row">
         <h2 className="text-xl text-white md:text-xl">Informations personnelles</h2>
-        <div className="flex justify-end gap-3 mb-4">
+        <div className="flex justify-start gap-3 mt-4 md:justify-end md:mb-4 md:mt-0">
           {!editMode
             ? ( <Button text="Modifier" variant="secondary" onClick={() => setEditMode(true)} />)
             : (
