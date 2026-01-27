@@ -24,6 +24,10 @@ export default function Header({user, picture, displayAddFriendWindow, logout}: 
     router.push("/profile");
   }
 
+  function redirectToCreateConversation() {
+    router.push("/createConversation");
+  }
+
   return(
     <div className="shrink-0 flex justify-between items-center gap-2 w-full h-16 px-6 border-b bg-primary border-accent shadow-lg">
       <div className="flex justify-between items-center gap-3">
@@ -42,7 +46,7 @@ export default function Header({user, picture, displayAddFriendWindow, logout}: 
       </div>
 
       <div className="flex justify-center items-center gap-3">
-        <Button imgSrc={ConversationIcon} imgAlt="Créer une conversation" variant="icon" />
+        <Button onClick={redirectToCreateConversation} imgSrc={ConversationIcon} imgAlt="Créer une conversation" variant="icon" />
         <Button onClick={displayAddFriendWindow} imgSrc={friendsIcon} imgAlt="Gestions des amis" variant="icon" />
         <Button onClick={logout} imgSrc={LogoutIcon} imgAlt="Déconnexion" imgColorInverted={true} variant="icon2"></Button>
       </div>
