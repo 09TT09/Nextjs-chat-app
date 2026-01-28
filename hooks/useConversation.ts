@@ -35,6 +35,7 @@ export function useConversations(userId: string | null) {
         createdAt: conversation.createdAt,
         participants: conversation.participants,
         otherUser: conversation.otherUser,
+        userToUser: conversation.userToUser,
       }));
 
       setConversations(formatted);

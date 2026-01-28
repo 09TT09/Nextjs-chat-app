@@ -7,11 +7,12 @@ interface InputTextProps {
   defaultValue?: string;
   placeholder?: string;
   error?: string;
+  required?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   variant?: "default" | "variant-1";
 }
 
-export default function InputText({ name, label, value, defaultValue, placeholder, error, onChange, variant = "default", }: InputTextProps) {
+export default function InputText({ name, label, value, defaultValue, placeholder, error, required, onChange, variant = "default", }: InputTextProps) {
   const isInline = variant === "variant-1";
 
   return (
@@ -41,7 +42,7 @@ export default function InputText({ name, label, value, defaultValue, placeholde
         placeholder={placeholder}
         onChange={onChange}
         type="text"
-        required
+        required={required}
         className={
           isInline
             ? `text-white border rounded-md border-gray-600 py-1 px-2 placeholder:text-gray-500`

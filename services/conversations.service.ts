@@ -38,6 +38,7 @@ export async function getConversationsByIds(userId: string) {
       id,
       name,
       created_at,
+      user_to_user,
       conversation_participants (
         user_id,
         profiles!conversation_participants_user_id_fkey (
@@ -56,6 +57,7 @@ export async function getConversationsByIds(userId: string) {
       conversationId: conversation.id,
       name: conversation.name,
       createdAt: conversation.created_at,
+      userToUser: conversation.user_to_user,
       participants,
       otherUser: participants.find(p => p.id !== userId) ?? null,
     };

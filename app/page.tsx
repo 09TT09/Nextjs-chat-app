@@ -106,7 +106,7 @@ export default function Home() {
         <div className="flex w-full h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]">
           <div className="w-8/20 max-w-lg p-3 border-r border-accent bg-primary">
             <h3 className="text-lg text-white mb-3">Conversations</h3>
-            <div className="mt-3">
+            <div className="flex flex-col gap-2 mt-3">
               <ConversationsList conversations={conversations} onSelectConversation={handleOpenConversation} />
             </div>
           </div>

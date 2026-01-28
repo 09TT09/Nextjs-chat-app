@@ -22,7 +22,11 @@ export default function ConversationsList({conversations, onSelectConversation} 
               )
               : ( <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full border border-accent bg-gray-400"></div>)}
             <div className="flex flex-col">
-              <p className="text-white text-sm">{conversation.otherUser?.pseudo ?? "Unknown user"}</p>
+              {conversation.userToUser ? (
+                <p className="text-white text-sm">{conversation.otherUser?.pseudo ?? "Utilisateur inconnu"}</p>
+              ) : (
+                <p className="text-white text-sm">{conversation.name ?? "Conversation de groupe"}</p>
+              )}
               {conversation.otherUser ? (
                 <div className="flex items-center justify-between text-gray-300 text-sm w-full">
                   <p>👤 {conversation.otherUser.pseudo ?? conversation.otherUser.email}</p>

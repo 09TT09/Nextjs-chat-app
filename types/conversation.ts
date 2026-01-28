@@ -21,4 +21,5 @@ export interface Conversation {
   otherUser: Profile | null;
   createdAt: string;
   participants: Profile[];
+  userToUser: boolean;
 }
